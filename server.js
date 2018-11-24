@@ -1,13 +1,18 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
+const cors = require('@koa/cors');
 const wdService = require('./wikidata-service');
 
 const app = new Koa();
 
+app.use(cors());
 app.use(bodyParser());
 
 app.use(async ctx => {
     switch (ctx.request.method.toUpperCase()) {
+        case 'OPTIONS':
+            ctx.body = 'Ok';
+            break;
         case 'GET':
             ctx.body = 'Wikidata Service is up and running!';
             break;

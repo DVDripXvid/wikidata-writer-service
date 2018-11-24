@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/DVDripXvid/wikidata-writer-service#readme",
   "dependencies": {
+    "@koa/cors": "^2.2.2",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
     "wikidata-edit": "^2.7.1"
