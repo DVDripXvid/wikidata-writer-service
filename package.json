@@ -1,0 +1,24 @@
+{
+  "name": "wikidata-writer-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DVDripXvid/wikidata-writer-service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DVDripXvid/wikidata-writer-service/issues"
+  },
+  "homepage": "https://github.com/DVDripXvid/wikidata-writer-service#readme",
+  "dependencies": {
+    "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "wikidata-edit": "^2.7.1"
+  }
+}
