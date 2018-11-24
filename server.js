@@ -3,6 +3,7 @@ const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
 const wdService = require('./wikidata-service');
 
+const port = 3000;
 const app = new Koa();
 
 app.use(cors());
@@ -48,4 +49,5 @@ app.use(async ctx => {
     }
 });
 
-app.listen(3000);
+app.listen(port);
+console.log('Koa server is listening on port: ' + port);
