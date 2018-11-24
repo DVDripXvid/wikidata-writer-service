@@ -2,7 +2,7 @@
   "name": "wikidata-writer-service",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,6 +21,7 @@
     "@koa/cors": "^2.2.2",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
+    "koa-static": "^5.0.0",
     "wikidata-edit": "^2.7.1"
   }
 }

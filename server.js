@@ -1,11 +1,21 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 const cors = require('@koa/cors');
+const serve = require('koa-static');
 const wdService = require('./wikidata-service');
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 const app = new Koa();
+const clientRoutes = ['/home'];
 
+app.use(async (ctx, next) => {
+    console.log(ctx.path);
+    if (clientRoutes.includes(ctx.path)) {
+        ctx.path = '/';
+    }
+    await next();
+});
+app.use(serve('./wikidata-spotify-matcher'));
 app.use(cors());
 app.use(bodyParser());
 
