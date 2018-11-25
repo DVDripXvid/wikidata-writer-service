@@ -715,7 +715,7 @@ var LibraryTreeComponent = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "backendConfig", function() { return backendConfig; });
 var backendConfig = {
-    host: 'http://localhost:3000',
+    host: '/',
 };
 
 
