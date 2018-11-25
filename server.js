@@ -6,26 +6,19 @@ const wdService = require('./wikidata-service');
 
 const port = process.env.PORT || 3000;
 const app = new Koa();
-const clientRoutes = ['/home'];
+const wwwPath = './public'
 
-app.use(async (ctx, next) => {
-    console.log(ctx.path);
-    if (clientRoutes.includes(ctx.path)) {
-        ctx.path = '/';
-    }
-    await next();
-});
-app.use(serve('./wikidata-spotify-matcher'));
 app.use(cors());
+app.use(serve(wwwPath));
 app.use(bodyParser());
 
-app.use(async ctx => {
+app.use(async (ctx, next) => {
     switch (ctx.request.method.toUpperCase()) {
         case 'OPTIONS':
             ctx.body = 'Ok';
             break;
         case 'GET':
-            ctx.body = 'Wikidata Service is up and running!';
+            await next();
             break;
         case 'PUT':
             const body = ctx.request.body;
@@ -58,6 +51,12 @@ app.use(async ctx => {
             ctx.throw(406, 'Method not supported: ' + ctx.request.method);
     }
 });
+
+app.use(async (ctx, next) => {
+    ctx.path = '/';
+    await next();
+});
+app.use(serve(wwwPath));
 
 app.listen(port);
 console.log('Koa server is listening on port: ' + port);
