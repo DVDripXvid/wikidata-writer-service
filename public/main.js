@@ -384,7 +384,7 @@ var HomeComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div *ngIf=\"isLoading\">\r\n  <mat-progress-bar mode=\"indeterminate\"></mat-progress-bar>\r\n  <h3>Please be patient while we are getting your spotify library</h3>\r\n</div>\r\n<div *ngIf=\"!isLoading\" class=\"row\">\r\n  <div class=\"column\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <form>\r\n          <mat-form-field>\r\n            <input matInput placeholder=\"Type to filter artists\" [ngModel]=\"artistSearchTerm\" (ngModelChange)=\"filterArtists($event)\"\r\n              name=\"artistSearchTerm\">\r\n          </mat-form-field>\r\n        </form>\r\n      </mat-card-header>\r\n      <mat-action-list>\r\n        <virtual-scroller #scroll [items]=\"library\">\r\n          <button *ngFor=\"let artist of scroll.viewPortItems\" mat-list-item (click)=\"artistClicked(artist)\">{{artist.name}}</button>\r\n        </virtual-scroller>\r\n      </mat-action-list>\r\n    </mat-card>\r\n  </div>\r\n  <div class=\"column\" *ngIf=\"selectedArtist\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <mat-card-title>{{selectedArtist.name}}</mat-card-title>\r\n        <mat-card-subtitle>ARTIST</mat-card-subtitle>\r\n      </mat-card-header>\r\n      <mat-action-list>\r\n        <button *ngFor=\"let album of selectedArtist.albums\" mat-list-item (click)=\"albumClicked(album)\">{{album.name}}</button>\r\n      </mat-action-list>\r\n    </mat-card>\r\n  </div>\r\n  <div class=\"column\" *ngIf=\"selectedAlbum\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <mat-card-title>{{selectedAlbum.name}}</mat-card-title>\r\n        <mat-card-subtitle>ALBUM</mat-card-subtitle>\r\n      </mat-card-header>\r\n      <mat-action-list>\r\n        <button *ngFor=\"let track of selectedAlbum.tracks\" mat-list-item (click)=\"onTrackSelected(track)\">{{track.name}}</button>\r\n      </mat-action-list>\r\n    </mat-card>\r\n  </div>\r\n  <div class=\"column\" *ngIf=\"trackSelected\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <mat-card-title>Wikidata matches</mat-card-title>\r\n        <mat-card-subtitle>TRACKS</mat-card-subtitle>\r\n      </mat-card-header>\r\n      <mat-list>\r\n        <mat-list-item *ngFor=\"let track of matchingWikidataSongs\">\r\n          <div *ngFor=\"let artist of track.artists\">\r\n            {{artist.labels['en']}}\r\n          </div>\r\n          {{track.name}}\r\n        </mat-list-item>\r\n      </mat-list>\r\n    </mat-card>\r\n  </div>\r\n</div>\r\n"
+module.exports = "<div *ngIf=\"isLoading\">\r\n  <mat-progress-bar mode=\"indeterminate\"></mat-progress-bar>\r\n  <h3>Please be patient while we are getting your spotify library</h3>\r\n</div>\r\n<div *ngIf=\"!isLoading\" class=\"row\">\r\n  <div class=\"loading-indicator\">\r\n    <mat-spinner *ngIf=\"wikiDetailsLoadMask\"></mat-spinner>\r\n  </div>\r\n  <div class=\"column\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <form>\r\n          <mat-form-field>\r\n            <input matInput placeholder=\"Type to filter artists\" [ngModel]=\"artistSearchTerm\" (ngModelChange)=\"filterArtists($event)\"\r\n              name=\"artistSearchTerm\">\r\n          </mat-form-field>\r\n        </form>\r\n      </mat-card-header>\r\n      <mat-action-list>\r\n        <virtual-scroller #scroll [items]=\"library\">\r\n          <button *ngFor=\"let artist of scroll.viewPortItems\" mat-list-item (click)=\"artistClicked(artist)\">{{artist.name}}</button>\r\n        </virtual-scroller>\r\n      </mat-action-list>\r\n    </mat-card>\r\n  </div>\r\n  <div class=\"column\" *ngIf=\"selectedArtist\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <mat-card-title>{{selectedArtist.name}}</mat-card-title>\r\n        <mat-card-subtitle>ARTIST</mat-card-subtitle>\r\n      </mat-card-header>\r\n      <mat-action-list>\r\n        <button *ngFor=\"let album of selectedArtist.albums\" mat-list-item (click)=\"albumClicked(album)\">{{album.name}}</button>\r\n      </mat-action-list>\r\n    </mat-card>\r\n  </div>\r\n  <div class=\"column\" *ngIf=\"selectedAlbum\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <mat-card-title>{{selectedAlbum.name}}</mat-card-title>\r\n        <mat-card-subtitle>ALBUM</mat-card-subtitle>\r\n      </mat-card-header>\r\n      <mat-action-list>\r\n        <button *ngFor=\"let track of selectedAlbum.tracks\" mat-list-item (click)=\"onTrackSelected(track)\">{{track.name}}</button>\r\n      </mat-action-list>\r\n    </mat-card>\r\n  </div>\r\n  <div class=\"details-column\" *ngIf=\"selectedTrack\">\r\n    <mat-card>\r\n      <mat-card-header>\r\n        <mat-card-title>Wikidata matches</mat-card-title>\r\n        <mat-card-subtitle>{{selectedArtist.name}}: {{selectedTrack.name}}</mat-card-subtitle>\r\n      </mat-card-header>\r\n\r\n      <div *ngIf=\"matchFound && !exactMatch\">\r\n        <mat-list>\r\n          <mat-list-item *ngFor=\"let track of matchingWikidataSongs\">\r\n            <div>\r\n              {{getArtists(track)}}{{':'}}{{' ' + track.name}}\r\n            </div>\r\n            <div class=\"auto-align\">\r\n              <button mat-raised-button color=\"accent\" (click)=\"updateSpotifyIdForSong(track)\">Yep, this is it.</button>\r\n            </div>\r\n          </mat-list-item>\r\n          <mat-list-item>\r\n            <button mat-raised-button color=\"primary\" style=\"width: 100%\" (click)=\"createSong(selectedTrack)\">\r\n              Can't find your track? Click here to create a new one in Wikidata.\r\n            </button>\r\n          </mat-list-item>\r\n        </mat-list>\r\n      </div>\r\n\r\n      <div *ngIf=\"matchFound && exactMatch && matchingWikidataSongs[0]\">\r\n        <mat-list>\r\n          <mat-list-item>\r\n            <span>Track found in Wikidata! It is an exact match!</span>\r\n          </mat-list-item>\r\n          <mat-list-item>\r\n            <span>{{matchingWikidataSongs[0].name}}</span>\r\n          </mat-list-item>\r\n          <mat-list-item>\r\n            <span>{{matchingWikidataSongs[0].description}}</span>\r\n          </mat-list-item>\r\n        </mat-list>\r\n      </div>\r\n\r\n      <div *ngIf=\"!matchFound && !exactMatch\">\r\n        <mat-list>\r\n          <mat-list-item>\r\n            <span>No matching track found in Wikidata!</span>\r\n          </mat-list-item>\r\n          <mat-list-item>\r\n            <button mat-raised-button color=\"primary\" style=\"width: 100%\" (click)=\"createSong(selectedTrack)\">\r\n              Save this to wikidata.\r\n            </button>\r\n          </mat-list-item>\r\n        </mat-list>\r\n      </div>\r\n    </mat-card>\r\n  </div>\r\n\r\n</div>"
 
 /***/ }),
 
@@ -395,7 +395,7 @@ module.exports = "<div *ngIf=\"isLoading\">\r\n  <mat-progress-bar mode=\"indete
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "virtual-scroller {\n  width: 100%;\n  height: 75vh; }\n\nmat-action-list {\n  height: 75vh;\n  overflow-y: auto; }\n\n.row {\n  white-space: nowrap;\n  height: 90vh; }\n\n.column {\n  display: inline-block;\n  height: 100%;\n  margin: 0.5rem;\n  width: 500px; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29tcG9uZW50cy9saWJyYXJ5LXRyZWUvRDpcXFdvcmtzcGFjZVxcd2lraWRhdGEtc3BvdGlmeS1tYXRjaGVyL3NyY1xcYXBwXFxjb21wb25lbnRzXFxsaWJyYXJ5LXRyZWVcXGxpYnJhcnktdHJlZS5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLFlBQVc7RUFDWCxhQUFZLEVBQUc7O0FBRWpCO0VBQ0ksYUFBWTtFQUNaLGlCQUFnQixFQUFHOztBQUV2QjtFQUNJLG9CQUFtQjtFQUNuQixhQUFZLEVBQUc7O0FBRW5CO0VBQ0ksc0JBQXFCO0VBQ3JCLGFBQVk7RUFDWixlQUFjO0VBQ2QsYUFBWSxFQUFHIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50cy9saWJyYXJ5LXRyZWUvbGlicmFyeS10cmVlLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsidmlydHVhbC1zY3JvbGxlciB7XG4gIHdpZHRoOiAxMDAlO1xuICBoZWlnaHQ6IDc1dmg7IH1cblxubWF0LWFjdGlvbi1saXN0IHtcbiAgICBoZWlnaHQ6IDc1dmg7XG4gICAgb3ZlcmZsb3cteTogYXV0bzsgfVxuXG4ucm93IHtcbiAgICB3aGl0ZS1zcGFjZTogbm93cmFwO1xuICAgIGhlaWdodDogOTB2aDsgfVxuXG4uY29sdW1uIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gICAgaGVpZ2h0OiAxMDAlO1xuICAgIG1hcmdpbjogMC41cmVtO1xuICAgIHdpZHRoOiA1MDBweDsgfVxuXG4iXX0= */"
+module.exports = "virtual-scroller {\n  width: 100%;\n  height: 75vh; }\n\nmat-action-list {\n  height: 75vh;\n  overflow-y: auto; }\n\nmat-list {\n  height: 75vh;\n  overflow-y: auto; }\n\n.row {\n  white-space: nowrap;\n  height: 90vh; }\n\n.column {\n  display: inline-block;\n  height: 100%;\n  margin: 0.5rem;\n  width: 500px; }\n\n.details-column {\n  display: inline-block;\n  height: 100%;\n  margin: 0.5rem;\n  width: 800px; }\n\n.loading-indicator {\n  position: fixed;\n  z-index: 999;\n  height: 2em;\n  width: 2em;\n  overflow: show;\n  margin: auto;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0; }\n\n.auto-align {\n  margin: auto; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29tcG9uZW50cy9saWJyYXJ5LXRyZWUvRDpcXFdvcmtzcGFjZVxcd2lraWRhdGEtc3BvdGlmeS1tYXRjaGVyL3NyY1xcYXBwXFxjb21wb25lbnRzXFxsaWJyYXJ5LXRyZWVcXGxpYnJhcnktdHJlZS5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLFlBQVc7RUFDWCxhQUFZLEVBQUc7O0FBRWpCO0VBQ0ksYUFBWTtFQUNaLGlCQUFnQixFQUFHOztBQUV2QjtFQUNJLGFBQVk7RUFDWixpQkFBZ0IsRUFBRzs7QUFFdkI7RUFDSSxvQkFBbUI7RUFDbkIsYUFBWSxFQUFHOztBQUVuQjtFQUNJLHNCQUFxQjtFQUNyQixhQUFZO0VBQ1osZUFBYztFQUNkLGFBQVksRUFBRzs7QUFFbkI7RUFDSSxzQkFBcUI7RUFDckIsYUFBWTtFQUNaLGVBQWM7RUFDZCxhQUFZLEVBQUc7O0FBRW5CO0VBQ0UsZ0JBQWU7RUFDZixhQUFZO0VBQ1osWUFBVztFQUNYLFdBQVU7RUFDVixlQUFjO0VBQ2QsYUFBWTtFQUNaLE9BQU07RUFDTixRQUFPO0VBQ1AsVUFBUztFQUNULFNBQVEsRUFBRzs7QUFFYjtFQUNJLGFBQVksRUFBRyIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudHMvbGlicmFyeS10cmVlL2xpYnJhcnktdHJlZS5jb21wb25lbnQuc2FzcyIsInNvdXJjZXNDb250ZW50IjpbInZpcnR1YWwtc2Nyb2xsZXIge1xuICB3aWR0aDogMTAwJTtcbiAgaGVpZ2h0OiA3NXZoOyB9XG5cbm1hdC1hY3Rpb24tbGlzdCB7XG4gICAgaGVpZ2h0OiA3NXZoO1xuICAgIG92ZXJmbG93LXk6IGF1dG87IH1cblxubWF0LWxpc3Qge1xuICAgIGhlaWdodDogNzV2aDtcbiAgICBvdmVyZmxvdy15OiBhdXRvOyB9XG5cbi5yb3cge1xuICAgIHdoaXRlLXNwYWNlOiBub3dyYXA7XG4gICAgaGVpZ2h0OiA5MHZoOyB9XG5cbi5jb2x1bW4ge1xuICAgIGRpc3BsYXk6IGlubGluZS1ibG9jaztcbiAgICBoZWlnaHQ6IDEwMCU7XG4gICAgbWFyZ2luOiAwLjVyZW07XG4gICAgd2lkdGg6IDUwMHB4OyB9XG5cbi5kZXRhaWxzLWNvbHVtbiB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgIGhlaWdodDogMTAwJTtcbiAgICBtYXJnaW46IDAuNXJlbTtcbiAgICB3aWR0aDogODAwcHg7IH1cblxuLmxvYWRpbmctaW5kaWNhdG9yIHtcbiAgcG9zaXRpb246IGZpeGVkO1xuICB6LWluZGV4OiA5OTk7XG4gIGhlaWdodDogMmVtO1xuICB3aWR0aDogMmVtO1xuICBvdmVyZmxvdzogc2hvdztcbiAgbWFyZ2luOiBhdXRvO1xuICB0b3A6IDA7XG4gIGxlZnQ6IDA7XG4gIGJvdHRvbTogMDtcbiAgcmlnaHQ6IDA7IH1cblxuLmF1dG8tYWxpZ24ge1xuICAgIG1hcmdpbjogYXV0bzsgfVxuXG5cbiJdfQ== */"
 
 /***/ }),
 
@@ -477,10 +477,12 @@ var LibraryTreeComponent = /** @class */ (function () {
         this.wdk = wdk;
         this.artistSearchTerm = '';
         this.isLoading = false;
+        this.wikiDetailsLoadMask = false;
         this.library = [];
         this.tracks = [];
         this.matchingWikidataSongs = [];
-        this.trackSelected = false;
+        this.matchFound = false;
+        this.exactMatch = false;
     }
     LibraryTreeComponent.prototype.ngOnInit = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -521,10 +523,12 @@ var LibraryTreeComponent = /** @class */ (function () {
         else {
             this.selectedAlbum = null;
         }
+        this.selectedTrack = null;
     };
     LibraryTreeComponent.prototype.albumClicked = function (album) {
         this.waitForUpdate().then(this.scrollToTheRight);
         this.selectedAlbum = album;
+        this.selectedTrack = null;
     };
     LibraryTreeComponent.prototype.filterArtists = function (term) {
         this.artistSearchTerm = term;
@@ -600,19 +604,27 @@ var LibraryTreeComponent = /** @class */ (function () {
     };
     LibraryTreeComponent.prototype.onTrackSelected = function (track) {
         return __awaiter(this, void 0, void 0, function () {
-            var entity, entities;
+            var entity, song, entities;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.matchingWikidataSongs = [];
-                        this.trackSelected = true;
+                        this.selectedTrack = track;
+                        this.wikiDetailsLoadMask = true;
+                        console.log('Selected track: ', this.selectedTrack);
                         return [4 /*yield*/, this.wdk.getSongBySpotifyId(track.id)];
                     case 1:
                         entity = _a.sent();
                         if (entity) {
                             console.log('Yeah we found a song in wikidata by its spotify id!');
-                            console.log(entity);
+                            song = new src_app_models_wikidata_models__WEBPACK_IMPORTED_MODULE_3__["WdkSongWrapper"](entity, this.wdk);
+                            this.matchingWikidataSongs.push(song);
+                            console.log('The song:', song);
+                            this.waitForUpdate().then(this.scrollToTheRight);
+                            this.wikiDetailsLoadMask = false;
+                            this.matchFound = true;
+                            this.exactMatch = true;
                             return [2 /*return*/];
                         }
                         return [4 /*yield*/, this.wdk.findSongsByTitle(track.name)];
@@ -620,11 +632,15 @@ var LibraryTreeComponent = /** @class */ (function () {
                         entities = _a.sent();
                         if (!entities || entities.length === 0) {
                             console.warn('Not found in wikidata: ' + track.name);
+                            this.waitForUpdate().then(this.scrollToTheRight);
+                            this.wikiDetailsLoadMask = false;
+                            this.matchFound = false;
+                            this.exactMatch = false;
                             return [2 /*return*/];
                         }
                         console.log('Found songs in wikidata for: ' + track.name);
                         Object.values(entities).forEach(function (e) { return __awaiter(_this, void 0, void 0, function () {
-                            var song, albums, artists;
+                            var song;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
@@ -632,14 +648,12 @@ var LibraryTreeComponent = /** @class */ (function () {
                                         return [4 /*yield*/, song.waitData];
                                     case 1:
                                         _a.sent();
-                                        albums = song.albums.map(function (a) { return a.labels.en; }).join(', ');
-                                        artists = song.artists.map(function (a) { return a.labels.en; }).join(', ');
-                                        console.log(artists + ": " + song.name + " (" + albums + ") - " + song.description);
                                         this.matchingWikidataSongs.push(song);
-                                        console.log('------------------------');
-                                        console.log(song);
-                                        console.log(albums);
-                                        console.log(artists);
+                                        this.waitForUpdate().then(this.scrollToTheRight);
+                                        this.wikiDetailsLoadMask = false;
+                                        this.matchFound = true;
+                                        this.exactMatch = false;
+                                        console.log('The song:', song);
                                         return [2 /*return*/];
                                 }
                             });
@@ -648,6 +662,32 @@ var LibraryTreeComponent = /** @class */ (function () {
                 }
             });
         });
+    };
+    LibraryTreeComponent.prototype.getArtists = function (song) {
+        return song.artists.map(function (a) { return a.labels['en']; }).join(', ');
+    };
+    LibraryTreeComponent.prototype.createSong = function (song) {
+        var _this = this;
+        this.wikiDetailsLoadMask = true;
+        this.wdk.createSong(song.name, song.artists.map(function (a) { return a.name; }), song.id).then(function (onSuccess) {
+            _this.wikiDetailsLoadMask = false;
+            _this.onTrackSelected(song);
+        }).catch(function (onError) {
+            console.error('Failed to create song:', song);
+        });
+    };
+    LibraryTreeComponent.prototype.updateSpotifyIdForSong = function (song) {
+        var _this = this;
+        this.wikiDetailsLoadMask = true;
+        this.wdk.setSpotifyTrackIdForEntity(song.entityId, this.selectedTrack.id).then(function (onSuccess) {
+            _this.wikiDetailsLoadMask = false;
+            _this.onTrackSelected(_this.selectedTrack);
+        }).catch(function (onError) {
+            console.error('Failed to update song:', song);
+        });
+    };
+    LibraryTreeComponent.prototype.hasArtist = function (song) {
+        return song.artists !== undefined && song.artists.length > 0;
     };
     LibraryTreeComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -675,7 +715,7 @@ var LibraryTreeComponent = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "backendConfig", function() { return backendConfig; });
 var backendConfig = {
-    host: '/',
+    host: 'http://localhost:3000',
 };
 
 
@@ -898,13 +938,30 @@ var WdkSongWrapper = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(WdkSongWrapper.prototype, "spotifyId", {
+        get: function () {
+            var ids = this.entity.claims[_config_wikidata_config__WEBPACK_IMPORTED_MODULE_0__["propertyIds"].spotifyTrackId];
+            return this.entity.claims[_config_wikidata_config__WEBPACK_IMPORTED_MODULE_0__["propertyIds"].spotifyTrackId]
+                ? ids[0]
+                : null;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(WdkSongWrapper.prototype, "entityId", {
+        get: function () {
+            return this.entity.id;
+        },
+        enumerable: true,
+        configurable: true
+    });
     WdkSongWrapper.prototype.findEntitesByIds = function (ids) {
         return this.relatedEntites.filter(function (e) { return ids.includes(e.id); });
     };
     WdkSongWrapper.relatedPropIds = [
         _config_wikidata_config__WEBPACK_IMPORTED_MODULE_0__["propertyIds"].genre,
         _config_wikidata_config__WEBPACK_IMPORTED_MODULE_0__["propertyIds"].partOf,
-        _config_wikidata_config__WEBPACK_IMPORTED_MODULE_0__["propertyIds"].performer
+        _config_wikidata_config__WEBPACK_IMPORTED_MODULE_0__["propertyIds"].performer,
     ];
     return WdkSongWrapper;
 }());
@@ -956,9 +1013,6 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var __metadata = (undefined && undefined.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -1002,7 +1056,6 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 var WikidataService = /** @class */ (function () {
     function WikidataService() {
-        this.createSong('Onwards', ['Hans Zimmer'], '47RmfgEfQF8U0yli78dbwt');
     }
     WikidataService.prototype.createSong = function (name, artists, spotifyId) {
         return fetch(_config_backend_config__WEBPACK_IMPORTED_MODULE_0__["backendConfig"].host, {
@@ -1151,8 +1204,7 @@ var WikidataService = /** @class */ (function () {
     WikidataService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_2__["Injectable"])({
             providedIn: 'root'
-        }),
-        __metadata("design:paramtypes", [])
+        })
     ], WikidataService);
     return WikidataService;
 }());
